@@ -1,9 +1,18 @@
 import React, { Component } from 'react';
 import classes from './App.module.css';
-import People from '../components/People/People';
+// import People from '../components/People/People';
+import People from '../components/People/People_class';
+
 import Cockpit from '../components/Cockpit/Cockpit';
 
 class App extends Component {
+  /* SPECIAL lifecycle method - creation */
+  constructor(props) {
+    super(props);
+    console.log('[App.js] constructor');
+  }
+
+  /* More modern way to create state in React */
   state = {
     people: [
       { id: 'lnaiia', name: 'Max', age: 28 },
@@ -14,6 +23,28 @@ class App extends Component {
     showPeople: false,
   };
 
+  /* lifecycle method - creation / update */
+  static getDerivedStateFromProps(props, state) {
+    console.log('[App.js] getDerivedStateFromProps', props);
+    return state;
+  }
+
+  /* lifecycle method - creation http requests */
+  componentDidMount() {
+    console.log('[App.js] componentDidMount');
+  }
+  
+  /* lifecycle methid, used for performance */
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('[App.js] shouldComponentUpdate');
+    return true;
+  }
+
+  /* lifecycle method - update - creation http requests */
+  componentDidUpdate() {
+    console.log('[App.js] componentDidUpdate');
+  }
+  
   nameChangedHandler = (event, id) => {
     const personIndex = this.state.people.findIndex(person => {
       return person.id === id;
@@ -38,22 +69,27 @@ class App extends Component {
     this.setState({ showPeople: !doesShow });
   }
 
+ /* lifecycle method - creation */
   render() {
+    console.log('[App.js] render');
     let people = null;
 
     if (this.state.showPeople) {
-      people = <People
-        people={this.state.people}
-        clicked={this.deletePersonHandler}
-        changed={this.nameChangedHandler} />
+      people = (
+        <People
+          people={this.state.people}
+          clicked={this.deletePersonHandler}
+          changed={this.nameChangedHandler} />
+      );
     }
-    
+
     return (
       <div className={classes.App}>
         <Cockpit
+          title={this.props.appTitle}
           showPeople={this.state.showPeople}
-          people={this.state.people} 
-          clicked={this.togglePeopleHandler}/>
+          people={this.state.people}
+          clicked={this.togglePeopleHandler} />
         {people}
       </div>
     );
