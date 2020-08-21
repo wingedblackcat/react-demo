@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-
-import './App.css';
-import Person from './Person/Person';
+import classes from './App.module.css';
+import People from '../components/People/People';
+import Cockpit from '../components/Cockpit/Cockpit';
 
 class App extends Component {
   state = {
@@ -18,16 +18,12 @@ class App extends Component {
     const personIndex = this.state.people.findIndex(person => {
       return person.id === id;
     });
-
     const person = {
       ...this.state.people[personIndex],
     }
-
     person.name = event.target.value;
-
     const people = [...this.state.people];
     people[personIndex] = person;
-
     this.setState({ people: people });
   }
 
@@ -46,42 +42,20 @@ class App extends Component {
     let people = null;
 
     if (this.state.showPeople) {
-      people = (
-        <div>
-          {this.state.people.map((person, index) => {
-            return (
-              <Person
-                click={() => this.deletePersonHandler(index)}
-                name={person.name}
-                age={person.age}
-                key={person.id}
-                changed={(event) => this.nameChangedHandler(event, person.id)} />
-            )
-          })}
-        </div>
-      );
+      people = <People
+        people={this.state.people}
+        clicked={this.deletePersonHandler}
+        changed={this.nameChangedHandler} />
     }
-
-    const classes = [];
-    if (this.state.people.length <= 2) {
-      classes.push('red');
-    }
-    if (this.state.people.length <= 1) {
-      classes.push('bold');
-    }
-
+    
     return (
-      <div className="App">
-        <h1>Hi, I'm a React App</h1>
-        <p className={classes.join(' ')}>This is really working</p>
-        <button
-          className='button'
-          onClick={this.togglePeopleHandler}>
-          Toggle People
-        </button>
+      <div className={classes.App}>
+        <Cockpit
+          showPeople={this.state.showPeople}
+          people={this.state.people} 
+          clicked={this.togglePeopleHandler}/>
         {people}
       </div>
-
     );
   }
 }
