@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import classes from './App.module.css';
 // import People from '../components/People/People';
 import People from '../components/People/People_class';
-
 import Cockpit from '../components/Cockpit/Cockpit';
+import WithClass from '../hoc/WithClass';
+import AuthContext from '../context/auth-context';
 
 class App extends Component {
   /* SPECIAL lifecycle method - creation */
@@ -21,6 +22,8 @@ class App extends Component {
     ],
     otherState: 'some other value',
     showPeople: false,
+    showCockpit: true,
+    authenticated: false,
   };
 
   /* lifecycle method - creation / update */
@@ -33,7 +36,7 @@ class App extends Component {
   componentDidMount() {
     console.log('[App.js] componentDidMount');
   }
-  
+
   /* lifecycle methid, used for performance */
   shouldComponentUpdate(nextProps, nextState) {
     console.log('[App.js] shouldComponentUpdate');
@@ -44,7 +47,7 @@ class App extends Component {
   componentDidUpdate() {
     console.log('[App.js] componentDidUpdate');
   }
-  
+
   nameChangedHandler = (event, id) => {
     const personIndex = this.state.people.findIndex(person => {
       return person.id === id;
@@ -69,7 +72,11 @@ class App extends Component {
     this.setState({ showPeople: !doesShow });
   }
 
- /* lifecycle method - creation */
+  loginHandler = () => {
+    this.setState({ authenticated: true });
+  }
+
+  /* lifecycle method - creation */
   render() {
     console.log('[App.js] render');
     let people = null;
@@ -79,19 +86,35 @@ class App extends Component {
         <People
           people={this.state.people}
           clicked={this.deletePersonHandler}
-          changed={this.nameChangedHandler} />
+          changed={this.nameChangedHandler}
+          isAuthenticated={this.state.authenticated} />
       );
     }
 
     return (
-      <div className={classes.App}>
-        <Cockpit
-          title={this.props.appTitle}
-          showPeople={this.state.showPeople}
-          people={this.state.people}
-          clicked={this.togglePeopleHandler} />
-        {people}
-      </div>
+      <WithClass classes={classes.App}>
+        <button onClick={() => {
+          this.setState({ showCockpit: false });
+        }}>
+          Remove Cockpit
+        </button>
+        <AuthContext.Provider
+          value={{
+            authenticated: this.state.authenticated,
+            login: this.loginHandler
+          }}>
+          {
+            this.state.showCockpit ? (
+              < Cockpit
+                title={this.props.appTitle}
+                showPeople={this.state.showPeople}
+                peopleLength={this.state.people.length}
+                clicked={this.togglePeopleHandler} />
+            ) : null
+          }
+          {people}
+        </AuthContext.Provider>
+      </WithClass>
     );
   }
 }
